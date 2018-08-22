@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using JetBrains.Annotations;
 using WireMock.Validation;
 
@@ -134,6 +135,20 @@ namespace WireMock.Matchers.Request
                 if (requestMessage.Body != null)
                 {
                     return stringMatcher.IsMatch(requestMessage.Body);
+                }
+				
+				// If the body is a byte array, attempt to convert it and match on that
+                if (requestMessage.BodyAsBytes != null)
+                {
+                    try // to convert from the byte[] to a string
+                    { 
+                        var input = Encoding.UTF8.GetString(requestMessage.BodyAsBytes);
+                        return stringMatcher.IsMatch(input);
+                    } 
+                    catch 
+                    {
+                        // just ignore the exception
+                    }
                 }
             }
 
